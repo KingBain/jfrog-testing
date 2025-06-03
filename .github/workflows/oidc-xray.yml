@@ -6,6 +6,7 @@ on:
 permissions:
   id-token: write      
   contents: read   
+  security-events: write
 
 jobs:
   scan-hello-world:
@@ -31,5 +32,6 @@ jobs:
       - name: Scan “container” image with JFrog Xray
         run: |
           # This command asks JFrog Xray to scan the local "hello-world:latest" image
-          jf xray scan docker "ghcr.io/fsdh-pfds/ado-az-tf-pwsh-runner:latest"
+          #jf xray scan docker "ghcr.io/fsdh-pfds/ado-az-tf-pwsh-runner:latest"
+          jfrog rt xray "ghcr.io/fsdh-pfds/ado-az-tf-pwsh-runner:latest" --fail-fast --output json
 
