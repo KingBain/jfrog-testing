@@ -2,11 +2,10 @@ name: "JFrog Docker Scan Example"
 
 on:
   workflow_dispatch:    # Manual trigger
-  push:                # Or trigger on any push
 
 permissions:
-  id-token: write      # Needed to let jfrog/setup-jfrog-cli fetch an OIDC token
-  contents: read       # Needed for actions/checkout
+  id-token: write      
+  contents: read   
 
 jobs:
   scan-hello-world:
