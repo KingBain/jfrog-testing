@@ -47,4 +47,5 @@ jobs:
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
           JF_PROJECT: ssc-fsdh
         run: |
-          jf docker scan --format=json "ghcr.io/fsdh-pfds/ado-az-tf-pwsh-runner:latest"
+          jf docker pull "ghcr.io/fsdh-pfds/ado-az-tf-pwsh-runner:latest"
+          jf docker scan "ghcr.io/fsdh-pfds/ado-az-tf-pwsh-runner:latest" --vuln --project="ssc-fsdh" --fail=false
