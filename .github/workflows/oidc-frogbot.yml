@@ -18,6 +18,10 @@ jobs:
         with:
           oidc-provider-name: github-oidc
 
-
-          
-
+      - uses: jfrog/frogbot@v2
+        with:
+          oidc-provider-name: github-oidc
+        env:
+          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_GIT_BASE_BRANCH: "main"
