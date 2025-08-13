@@ -58,4 +58,4 @@ jobs:
         env:
           JF_URL: ${{ env.JF_URL }}
           JF_ACCESS_TOKEN: ${{ steps.access-token.outputs.token }}
-          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
