@@ -1,0 +1,61 @@
+name: Frogbot OIDC with Inline Access Token
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write         
+  contents: read
+  pull-requests: write
+
+env:
+  ARTIFACTORY_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
+  AUDIENCE: github
+  PROVIDER: github-oidc
+  ORG: ${{ github.repository_owner }}
+  REPOSITORY: ${{ github.event.repository.name }}
+  JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get Access Token from JFrog via OIDC
+        id: access-token
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Optional: one-time OIDC customization (usually done manually)
+          curl -sLS -XPUT -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${ORG}/${REPOSITORY}/actions/oidc/customization/sub \
+            -d '{"use_default":false,"include_claim_keys":["repo"]}'
+
+          # Request ID token from GitHub OIDC
+          ID_TOKEN=$(curl -sLS \
+            -H "User-Agent: actions/oidc-client" \
+            -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${AUDIENCE}" | jq -r .value)
+
+          # Exchange ID token with JFrog for access token
+          REQ=$(curl -sLS -XPOST "${ARTIFACTORY_URL}/access/api/v1/oidc/token" \
+            -H "Content-type: application/json" \
+            -d "{\"grant_type\": \"urn:ietf:params:oauth:grant-type:token-exchange\", \
+                 \"subject_token_type\":\"urn:ietf:params:oauth:token-type:id_token\", \
+                 \"subject_token\": \"$ID_TOKEN\", \
+                 \"provider_name\": \"${PROVIDER}\"}")
+          ACCESS_TOKEN=$(echo "$REQ" | jq -r .access_token)
+
+          echo ::add-mask::$ACCESS_TOKEN
+          echo "token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Run Frogbot with Access Token
+        uses: jfrog/frogbot@v2
+        env:
+          JF_URL: ${{ env.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ steps.access-token.outputs.token }}
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
