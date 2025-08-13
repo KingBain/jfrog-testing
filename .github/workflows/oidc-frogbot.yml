@@ -1,0 +1,23 @@
+name: "Jfrog Frogbot OIDC Test"
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write 
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure JFrog CLI via OIDC
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
+          JF_PROJECT: ssc-fsdh
+        with:
+          oidc-provider-name: github-oidc
+
+
+          
+
