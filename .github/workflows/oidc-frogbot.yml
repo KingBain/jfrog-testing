@@ -18,7 +18,7 @@ jobs:
         with:
           oidc-provider-name: github-oidc
 
-      - uses: jfrog/frogbot@v2.28.0
+      - uses: jfrog/frogbot@dev
         with:
           oidc-provider-name: github-oidc
         env:
