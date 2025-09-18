@@ -17,6 +17,7 @@ jobs:
           JF_PROJECT: ssc-fsdh
         with:
           oidc-provider-name: github-oidc
+          version: latest
 
       - uses: jfrog/frogbot@dev
         with:
