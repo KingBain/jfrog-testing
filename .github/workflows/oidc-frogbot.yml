@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure JFrog CLI via OIDC
-        uses: jfrog/setup-jfrog-cli@v4
+        uses: jfrog/setup-jfrog-cli@v4.6.1
         env:
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
           JF_PROJECT: ssc-fsdh
         with:
           oidc-provider-name: github-oidc
 
-      - uses: jfrog/frogbot@v2.27.2
+      - uses: jfrog/frogbot@v2.28.0
         with:
           oidc-provider-name: github-oidc
         env:
