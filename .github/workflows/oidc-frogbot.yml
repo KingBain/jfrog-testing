@@ -19,7 +19,7 @@ jobs:
           oidc-provider-name: github-oidc
           version: latest
 
-      - uses: KingBain/gigafrogbot@master
+      - uses: jfrog/frogbot@v2.29.0
         with:
           oidc-provider-name: github-oidc
         env:
