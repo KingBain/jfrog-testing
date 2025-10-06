@@ -3,13 +3,12 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write 
+  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - name: Configure JFrog CLI via OIDC
         uses: jfrog/setup-jfrog-cli@v4.6.1
         env:
@@ -17,13 +16,49 @@ jobs:
         with:
           oidc-provider-name: github-oidc
 
-      - name: Run JFrog CLI commands
+      - name: Sanity check (ping) and identity
         env:
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
         run: |
-          # Test the connection
+          set -euo pipefail
+          echo "== jf rt ping =="
           jf rt ping
 
-          # Test Scope
-          jf rt curl -s /access/api/v1/projects | jq -r '.[].project_key' | sort -u
-          
+          echo "== whoami (may require permission; ignore if 403) =="
+          jf rt curl -s -f /access/api/v1/users/me || echo "whoami: not permitted (expected for viewer)"
+
+      - name: Enumerate projects via Projects API (admin visibility required)
+        env:
+          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
+        run: |
+          set -euo pipefail
+          echo "== Projects visible to this identity (Projects API) =="
+          if jf rt curl -s -f /access/api/v1/projects > projects.json 2>/dev/null; then
+            jq -r '.[].project_key' projects.json | sort -u
+            echo "Count:" $(jq -r '.[].project_key' projects.json | sort -u | wc -l | tr -d ' ')
+          else
+            echo "Projects API not permitted (expected for non-admin roles)."
+          fi
+
+      - name: Enumerate projects inferred from repositories (works with read-only)
+        env:
+          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
+        run: |
+          set -euo pipefail
+          echo "== Repositories visible to this identity (scoped by JF_PROJECT if set) =="
+          jf rt curl -s -f /artifactory/api/repositories > repos.json
+          echo "== Unique project keys inferred from repos =="
+          jq -r '.[] | select(.projectKey != null) | .projectKey' repos.json | sort -u | tee /tmp/projects.txt
+          echo "Count:" $(sort -u /tmp/projects.txt | wc -l | tr -d ' ')
+
+          echo "== Sample repo visibility (first 10) =="
+          jq -r '.[] | "\(.key)  \(.type)  project=\(.projectKey // "-")"' repos.json | head -n 10
+
+      # Optional: show claim filters actually used by GitHub OIDC (helps debug unexpected access)
+      - name: Debug GitHub OIDC token (claims)
+        run: |
+          set -euo pipefail
+          TOKEN=$(curl -s -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL?audience=jfrog" | jq -r '.value')
+          echo "== JWT payload =="
+          echo "$TOKEN" | cut -d '.' -f2 | base64 --decode | jq .
