@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure JFrog CLI via OIDC
-        uses: jfrog/setup-jfrog-cli@v4.6.1
+        id: setup-jfrog-cli
+        uses: jfrog/setup-jfrog-cli@v4
         env:
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
         with:
@@ -25,7 +26,7 @@ jobs:
           jf rt ping
 
           echo "== whoami (may require permission; ignore if 403) =="
-          jf rt curl /access/api/v1/tokens/me
+          jf rt curl --user=${{ steps.setup-jfrog-cli.outputs.oidc-user }} --password=${{ steps.setup-jfrog-cli.outputs.oidc-token }} /access/api/v1/tokens/me
 
       - name: Enumerate projects via Projects API (admin visibility required)
         env:
