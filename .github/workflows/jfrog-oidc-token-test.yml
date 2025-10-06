@@ -14,7 +14,6 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4.6.1
         env:
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
-          JF_PROJECT: ssc-fsdh
         with:
           oidc-provider-name: github-oidc
 
@@ -25,6 +24,6 @@ jobs:
           # Test the connection
           jf rt ping
 
-          # est Scope
+          # Test Scope
           jf rt curl -s /access/api/v1/projects | jq -r '.[].project_key' | sort -u
           
