@@ -25,7 +25,7 @@ jobs:
           jf rt ping
 
           echo "== whoami (may require permission; ignore if 403) =="
-          jf rt curl -s -f /access/api/v1/tokens/me || echo "whoami: not permitted (expected for viewer)"
+          jf rt curl -s -f /access/api/v1/tokens/me
 
       - name: Enumerate projects via Projects API (admin visibility required)
         env:
