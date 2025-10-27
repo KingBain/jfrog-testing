@@ -30,4 +30,3 @@ jobs:
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JF_GIT_BASE_BRANCH: "main"
-          JF_PROJECT: "ssc-fsdh"
