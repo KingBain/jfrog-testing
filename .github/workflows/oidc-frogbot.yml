@@ -26,8 +26,8 @@ jobs:
         with:
           oidc-provider-name: github-oidc
         env:
+          JF_CLI_LOG_LEVEL: "DEBUG"
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JF_GIT_BASE_BRANCH: "main"
           JF_PROJECT: "ssc-fsdh"
-          JFROG_CLI_USER_AGENT: "setup-jfrog-cli-github-action/4.8.0"
