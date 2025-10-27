@@ -13,20 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Configure JFrog CLI via OIDC
-        uses: jfrog/setup-jfrog-cli@v4.8.0
-        env:
-          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
-          JF_PROJECT: ssc-fsdh
-        with:
-          oidc-provider-name: github-oidc
-          version: latest
-
       - uses: jfrog/frogbot@v2.29.1
         with:
           oidc-provider-name: github-oidc
         env:
+          oidc-provider-name: github-oidc
+          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca/
+          JF_PROJECT: ssc-fsdh
           JF_CLI_LOG_LEVEL: "DEBUG"
-          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca
+          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca/
           JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JF_GIT_BASE_BRANCH: "main"
