@@ -18,7 +18,6 @@ jobs:
           oidc-provider-name: github-oidc
         env:
           oidc-provider-name: github-oidc
-          JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca/
           JF_PROJECT: ssc-fsdh
           JF_CLI_LOG_LEVEL: "DEBUG"
           JF_URL: https://artifacts-artefacts.devops.cloud-nuage.canada.ca/
